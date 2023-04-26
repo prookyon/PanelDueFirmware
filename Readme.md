@@ -1,3 +1,5 @@
+## <span style="color:red">NB! This is a special version with some very specific changes, this is not what you are looking for </span>
+
 # PanelDueFirmware
 
 This firmware runs on PanelDue touchscreens available from Duet3D Ltd. and
