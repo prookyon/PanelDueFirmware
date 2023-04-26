@@ -126,6 +126,14 @@ elseif ("${DEVICE}" STREQUAL "7.0i")
 	)
 	set( DEVICE_FLAGS "${CPU_FLAGS_SAM4S4} -DSCREEN_70E=1" )
 	set( CMAKE_EXE_LINKER_FLAGS "${LD_FLAGS_SAM4S4}" )
+elseif ("${DEVICE}" STREQUAL "7.0ir")
+	target_sources( paneldue.elf PRIVATE
+		${SYSTEM_FILE_SAM4S4}
+		${STARTUP_FILE_SAM4S4}
+		${SYSCLK_FILE_SAM4S4}
+	)
+	set( DEVICE_FLAGS "${CPU_FLAGS_SAM4S4} -DSCREEN_70R=1" )
+	set( CMAKE_EXE_LINKER_FLAGS "${LD_FLAGS_SAM4S4}" )
 else()
 	message(FATAL_ERROR "${DEVICE} is invalid. Please configure a device cmake -DDEVICE=v2-4.3|v2-5.0|v2-7.0|v2-7.0c|v3-4.3|v3-5.0|v3-7.0|v3-7.0c|5.0i|7.0i")
 endif()

@@ -55,6 +55,13 @@
 #define IS_ER			(false)
 #endif
 
+#ifdef SCREEN_70R
+#define DISPLAY_TYPE DISPLAY_TYPE_ITDB02_70
+#define LARGE_FONT (1)
+#define IS_24BIT (true)
+#define IS_ER (false)
+#endif
+
 #define USE_CYRILLIC_CHARACTERS		(1)
 
 const uint32_t DefaultBaudRate = 57600;
