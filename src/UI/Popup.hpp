@@ -77,12 +77,12 @@ private:
 		const char *param;
 		TextButtonForAxis *button;
 	} dirMap[6] {
-		{ .text = LESS_ARROW "2.0", .param = "-2.0", .button = nullptr },
-		{ .text = LESS_ARROW "0.2", .param = "-0.2", .button = nullptr },
-		{ .text = LESS_ARROW "0.02", .param = "-0.02", .button = nullptr },
-		{ .text = MORE_ARROW "0.02", .param = "0.02", .button = nullptr },
-		{ .text = MORE_ARROW "0.2", .param = "0.2", .button = nullptr },
-		{ .text = MORE_ARROW "2.0", .param = "2.0", .button = nullptr },
+		{.text = LESS_ARROW "10", .param = "-10", .button = nullptr},
+		{.text = LESS_ARROW "1.0", .param = "-1.0", .button = nullptr},
+		{.text = LESS_ARROW "0.1", .param = "-0.1", .button = nullptr},
+		{.text = MORE_ARROW "0.1", .param = "0.1", .button = nullptr},
+		{.text = MORE_ARROW "1.0", .param = "1.0", .button = nullptr},
+		{.text = MORE_ARROW "10", .param = "10", .button = nullptr},
 	};
 
 	struct {
