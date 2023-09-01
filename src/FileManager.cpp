@@ -64,7 +64,14 @@ namespace FileManager
 	void FileSet::Display()
 	{
 		FileListUpdated();
-		UI::DisplayFilesOrMacrosList(isFilesList, cardNumber, numVolumes);
+		if (isFilesList)
+		{
+			UI::DisplayFilesPopup(cardNumber, numVolumes);
+		}
+		else
+		{
+			UI::DisplayMacrosPopup();
+		}
 		SetPending();							// refresh the list of files
 	}
 
@@ -132,6 +139,11 @@ namespace FileManager
 			// 3. Display the scroll buttons if needed
 			UI::EnableFileNavButtons(isFilesList, scrollOffset != 0, scrollOffset + numDisplayed < fileIndex.Size(), IsInSubdir());
 
+			if (isFilesList)
+			{
+				UI::FileListCardButtonUpdate(numVolumes);
+			}
+
 			// 4. Display the file list
 			for (size_t i = 0; i < numDisplayed; ++i)
 			{
@@ -149,10 +161,13 @@ namespace FileManager
 		}
 		else
 		{
-			UI::EnableFileNavButtons(isFilesList, false, false, false);
-			for (size_t i = 0; i < numDisplayed; ++i)
+			if (isFilesList)
 			{
-				UI::UpdateFileButton(isFilesList, i, nullptr, nullptr);
+				UI::DisplayFilesPopup(cardNumber, numVolumes);
+			}
+			else
+			{
+				UI::DisplayMacrosPopup();
 			}
 		}
 	}
@@ -266,7 +281,7 @@ namespace FileManager
 		if (isFilesList && cardNum < numVolumes)
 		{
 			cardNumber = cardNum;
-			UI::DisplayFilesOrMacrosList(isFilesList, cardNumber, numVolumes);
+			UI::DisplayFilesPopup(cardNumber, numVolumes);
 			whichList = -1;
 			FileListUpdated();								// this hides the file list until we receive a new one
 

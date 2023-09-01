@@ -4,27 +4,14 @@
 #include <cstring>
 #include <string>
 
+typedef void pwm_channel_t;
+
 #include "ObjectModel/PrinterStatus.hpp"
+#include "UI/Strings.hpp"
 
-enum class DisplayDimmerType : uint8_t
-{
-	never = 0,				// never dim the display
-	onIdle, 				// only display when printer status is idle
-	always,					// default - always dim
-	NumTypes
-};
-
-enum class HeaterCombineType : uint8_t
-{
-	notCombined = 0,
-	combined,
-	NumTypes
-};
-
-
-#include <UI/Strings.hpp>
-
+#ifndef ARRAY_SIZE
 #define ARRAY_SIZE(arr) (sizeof(arr)/sizeof(arr[0]))
+#endif
 
 static int print_index(size_t index);
 
@@ -117,6 +104,7 @@ static int print_index(size_t index)
 	PRINT_ENTRY(messages);
 	PRINT_ENTRY(firmwareVersion);
 	PRINT_ENTRY(response);
+	PRINT_ENTRY(noFilesFound);
 
 	// File popup
 	PRINT_ENTRY(filesOnCard);
