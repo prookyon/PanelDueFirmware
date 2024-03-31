@@ -41,6 +41,7 @@ namespace UI
 	extern void ActivateScreensaver();
 	extern bool DeactivateScreensaver();
 	extern void AnimateScreensaver();
+	extern void ShowFirmwareUpdatePopup();
 	extern void ShowAxis(size_t axis, bool b, const char* axisLetter = nullptr);
 	extern void UpdateAxisPosition(size_t axis, float fval);
 	extern void UpdateCurrentTemperature(size_t heater, float fval);
@@ -103,6 +104,7 @@ namespace UI
 
 	extern void SetBabystepOffset(size_t index, float f);
 	extern void SetAxisLetter(size_t index, char l);
+	extern void SetAxisMax(size_t index, float val);
 	extern void SetAxisVisible(size_t index, bool v);
 	extern void SetAxisWorkplaceOffset(size_t axisIndex, size_t workplaceIndex, float offset);
 	extern void SetCurrentWorkplaceNumber(uint8_t workplaceNumber);

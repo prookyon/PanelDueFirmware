@@ -79,11 +79,13 @@ static TextButton *controlPageMacroButtons[NumControlPageMacroButtons];
 static String<controlPageMacroTextLength> controlPageMacroText[NumControlPageMacroButtons];
 
 static PopupWindow *setTempPopup, *setRPMPopup, *movePopup, *extrudePopup, *fileListPopup, *macrosPopup, *fileDetailPopup, *baudPopup,
-		*volumePopup, *infoTimeoutPopup, *screensaverTimeoutPopup, *babystepAmountPopup, *feedrateAmountPopup, *areYouSurePopup, *keyboardPopup, *languagePopup, *coloursPopup, *screensaverPopup;
+		*volumePopup, *infoTimeoutPopup, *screensaverTimeoutPopup, *babystepAmountPopup, *feedrateAmountPopup, *areYouSurePopup, *keyboardPopup, *languagePopup, *coloursPopup, *screensaverPopup, *firmwareUpdatePopup;
 static StaticTextField *areYouSureTextField, *areYouSureQueryField;
 static DisplayField *emptyRoot, *baseRoot, *commonRoot, *controlRoot, *printRoot, *messageRoot, *setupRoot;
 static SingleButton *homeAllButton, *bedCompButton;
 static IconButtonWithText *homeButtons[MaxDisplayableAxes], *toolButtons[MaxSlots];
+
+static float axisMaxVal = 0.0;
 static FloatField *controlTabAxisPos[MaxDisplayableAxes];
 #if DISPLAY_X == 800
 static FloatField *printTabAxisPos[MaxDisplayableAxes];
@@ -104,7 +106,7 @@ static StaticTextField *nameField, *statusField;
 static StaticTextField *screensaverText;
 static IntegerButton *activeTemps[MaxSlots], *standbyTemps[MaxSlots];
 static IntegerButton *spd, *extrusionFactors[MaxSlots], *fanSpeed, *baudRateButton, *volumeButton, *infoTimeoutButton, *screensaverTimeoutButton, *feedrateAmountButton;
-static TextButton *languageButton, *coloursButton, *dimmingTypeButton, *heaterCombiningButton;
+static TextButton *languageButton, *coloursButton, *dimmingTypeButton, *heaterCombiningButton, *logLevelButton;
 static TextButtonWithLabel *babystepAmountButton;
 static SingleButton *moveButton, *extrudeButton, *macroButton;
 static PopupWindow *babystepPopup;
@@ -388,6 +390,18 @@ static void ChangeBrightness(bool up)
 	SetBrightness(nvData.GetBrightness() + adjust);
 }
 
+
+void UI::SetAxisMax(size_t index, float val)
+{
+	if (index >= MaxTotalAxes)
+	{
+		return;
+	}
+
+	axisMaxVal = max(axisMaxVal, val);
+}
+
+
 // Cycle through available display dimmer types
 static void ChangeDisplayDimmerType()
 {
@@ -475,9 +489,8 @@ static void CreateMovePopup(const ColourScheme& colours)
 		UI::ShowAxis(i, i < MIN_AXES, axisNames[i]);
 
 		DisplayField::SetDefaultColours(colours.popupTextColour, colours.popupInfoBackColour);
-		FloatField *f = new FloatField(axisPosYpos, column, xyFieldWidth, TextAlignment::Left, (i == 2) ? 2 : 1, axisNames[i]);
+		FloatField *f = new FloatField(axisPosYpos, column, xyFieldWidth, TextAlignment::Left, 2, axisNames[i]);
 		movePopupAxisPos[i] = f;
-		f->SetValue(0.0);
 		movePopup->AddField(f);
 		f->Show(i < MIN_AXES);
 		column += xyFieldWidth + fieldSpacing;
@@ -672,6 +685,15 @@ static void CreateScreensaverPopup()
 	screensaverPopup->AddField(screensaverText = new StaticTextField(row1, margin, screensaverTextWidth, TextAlignment::Left, text));
 }
 
+static void CreateFirmwareUpdatePopup()
+{
+	firmwareUpdatePopup = new PopupWindow(max(DisplayX, DisplayY), max(DisplayX, DisplayY), black, black, false);
+	DisplayField::SetDefaultColours(white, black);
+	static const char * text = "Updating firmware";
+	const int textWidth = DisplayField::GetTextWidth(text, DisplayX);
+	firmwareUpdatePopup->AddField(new StaticTextField(DisplayY/2-rowHeight/2, DisplayX/2-textWidth/2, textWidth, TextAlignment::Left, text));
+}
+
 // Create the baud rate adjustment popup
 static void CreateBaudRatePopup(const ColourScheme& colours)
 {
@@ -763,6 +785,7 @@ static void CreateKeyboardPopup(uint32_t language, ColourScheme colours)
 			keysEN,	// Spanish
 			keysEN,	// Czech
 			keysEN,	// Italian
+			keysEN,	// Dutch
 			keysEN,	// Polish
 #if USE_CYRILLIC_CHARACTERS
 			keysEN,	// Ukrainian
@@ -874,7 +897,6 @@ static void CreateTemperatureGrid(const ColourScheme& colours)
 		// Add the current temperature field
 		DisplayField::SetDefaultColours(colours.infoTextColour, colours.defaultBackColour);
 		FloatField * const f = new FloatField(row3 + labelRowAdjust, column, tempButtonWidth, TextAlignment::Centre, 1);
-		f->SetValue(0.0);
 		f->Show(false);
 		currentTemps[i] = f;
 		mgr.AddField(f);
@@ -908,9 +930,8 @@ static void CreateControlTabFields(const ColourScheme& colours)
 	PixelNumber xyFieldWidth = (DISPLAY_X - (2 * margin) - (MaxDisplayableAxes * fieldSpacing))/(MaxDisplayableAxes + 1);
 	for (size_t i = 0; i < MaxDisplayableAxes; ++i)
 	{
-		FloatField * const f = new FloatField(row6p3 + labelRowAdjust, column, xyFieldWidth, TextAlignment::Left, (i == 2) ? 2 : 1, axisNames[i]);
+		FloatField * const f = new FloatField(row6p3 + labelRowAdjust, column, xyFieldWidth, TextAlignment::Left, 2, axisNames[i]);
 		controlTabAxisPos[i] = f;
-		f->SetValue(0.0);
 		mgr.AddField(f);
 		f->Show(i < MIN_AXES);
 		column += xyFieldWidth + fieldSpacing;
@@ -1013,9 +1034,8 @@ static void CreatePrintingTabFields(const ColourScheme& colours)
 	PixelNumber xyFieldWidth = (DISPLAY_X - (2 * margin) - (MaxDisplayableAxes * fieldSpacing))/(MaxDisplayableAxes + 1);
 	for (size_t i = 0; i < MaxDisplayableAxes; ++i)
 	{
-		FloatField * const f = new FloatField(row8 + labelRowAdjust - 4, column, xyFieldWidth, TextAlignment::Left, (i == 2) ? 2 : 1, axisNames[i]);
+		FloatField * const f = new FloatField(row8 + labelRowAdjust - 4, column, xyFieldWidth, TextAlignment::Left, 2, axisNames[i]);
 		printTabAxisPos[i] = f;
-		f->SetValue(0.0);
 		mgr.AddField(f);
 		f->Show(i < MIN_AXES);
 		column += xyFieldWidth + fieldSpacing;
@@ -1105,6 +1125,7 @@ static void CreateSetupTabFields(uint32_t language, const ColourScheme& colours)
 	feedrateAmountButton->SetValue(nvData.GetFeedrate());
 
 	heaterCombiningButton  = AddTextButton(row8, 0, 3, strings->heaterCombineTypeNames[(unsigned int)nvData.GetHeaterCombineType()], evSetHeaterCombineType, nullptr);
+	logLevelButton = AddTextButton(row8, 1, 3, strings->logLevelNames[(unsigned int)MessageLog::LogLevelGet()], evSetLogLevel, nullptr);
 
 	DisplayField::SetDefaultColours(colours.labelTextColour, colours.defaultBackColour);
 	mgr.AddField(ipAddressField = new TextField(row9, margin, DisplayX/2 - margin, TextAlignment::Left, "IP: ", ipAddress.c_str()));
@@ -1146,6 +1167,7 @@ static void CreateMainPages(uint32_t language, const ColourScheme& colours)
 	CreateMessageTabFields(colours);
 	CreateSetupTabFields(language, colours);
 	CreateScreensaverPopup();
+	CreateFirmwareUpdatePopup();
 }
 
 namespace UI
@@ -1328,6 +1350,16 @@ namespace UI
 			if (axis != nullptr && axis->slot < MaxDisplayableAxes)
 			{
 				size_t slot = axis->slot;
+
+				if (axisMaxVal > 1000)
+				{
+					controlTabAxisPos[slot]->SetNumDecimals(1);
+#if DISPLAY_X == 800
+					printTabAxisPos[slot]->SetNumDecimals(1);
+#endif
+					movePopupAxisPos[slot]->SetNumDecimals(1);
+				}
+
 				controlTabAxisPos[slot]->SetValue(fval);
 #if DISPLAY_X == 800
 				printTabAxisPos[slot]->SetValue(fval);
@@ -1436,7 +1468,8 @@ namespace UI
 			const char *fromStatus = GetStatusString(oldStatus);
 			const char *toStatus = GetStatusString(newStatus);
 
-			MessageLog::AppendMessageF("Info: status changed from %s to %s.", fromStatus, toStatus);
+			MessageLog::AppendMessageF(MessageLog::LogLevel::Verbose,
+					"Info: status changed from %s to %s.", fromStatus, toStatus);
 		}
 
 		switch (newStatus)
@@ -1636,6 +1669,11 @@ namespace UI
 			SwitchToTab(newTab);
 		}
 		return true;
+	}
+
+	void ShowFirmwareUpdatePopup()
+	{
+		mgr.SetPopup(firmwareUpdatePopup);
 	}
 
 	void ActivateScreensaver()
@@ -2959,6 +2997,20 @@ namespace UI
 				heaterCombiningButton->SetText(strings->heaterCombineTypeNames[(unsigned int)nvData.GetHeaterCombineType()]);
 				break;
 
+			case evSetLogLevel:
+				{
+					MessageLog::LogLevel logLevel = MessageLog::LogLevelGet();
+
+					logLevel = (MessageLog::LogLevel)(((int)logLevel + 1) % (int)MessageLog::LogLevel::NumTypes);
+
+					logLevelButton->SetText(strings->logLevelNames[(unsigned int)logLevel]);
+
+					nvData.SetLogLevel(logLevel);
+
+					MessageLog::LogLevelSet(logLevel);
+				}
+				break;
+
 			case evYes:
 				CurrentButtonReleased();
 				mgr.ClearPopup();								// clear the yes/no popup
@@ -3205,6 +3257,7 @@ namespace UI
 		{
 			for (size_t i = 0; i < ARRAY_SIZE(filenameButtons); i++)
 			{
+				filenameButtons[i]->Press(false, 0);
 				filenameButtons[i]->Show(false);
 			}
 			fileListPopupNoFiles->Show(true);
@@ -3221,9 +3274,10 @@ namespace UI
 	{
 		if (isLandscape)
 		{
-			for (size_t i = 0; i < ARRAY_SIZE(filenameButtons); i++)
+			for (size_t i = 0; i < ARRAY_SIZE(macroButtons); i++)
 			{
-				filenameButtons[i]->Show(false);
+				macroButtons[i]->Press(false, 0);
+				macroButtons[i]->Show(false);
 			}
 			mgr.SetPopup(macrosPopup, AutoPlace, AutoPlace);
 		}
@@ -3256,10 +3310,10 @@ namespace UI
 	{
 		if (filesNotMacros && text)
 		{
-			mgr.Show(fileListPopupNoFiles, false);
+			fileListPopupNoFiles->Show(false);
 		}
 
-		if (text && buttonIndex < ((filesNotMacros) ? NumDisplayedFiles : NumDisplayedMacros))
+		if (buttonIndex < ((filesNotMacros) ? NumDisplayedFiles : NumDisplayedMacros))
 		{
 			TextButton * const f = ((filesNotMacros) ? filenameButtons : macroButtons)[buttonIndex];
 			f->SetText(text);

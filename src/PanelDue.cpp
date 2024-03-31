@@ -294,6 +294,7 @@ enum ReceivedDataEvent
 	rcvMoveAxesHomed,
 	rcvMoveAxesLetter,
 	rcvMoveAxesMachinePosition,
+	rcvMoveAxesMax,
 	rcvMoveAxesUserPosition,
 	rcvMoveAxesVisible,
 	rcvMoveAxesWorkplaceOffsets,
@@ -409,6 +410,7 @@ static FieldTableEntry fieldTable[] =
 	{ rcvMoveAxesHomed,					"move:axes^:homed" },
 	{ rcvMoveAxesLetter,	 			"move:axes^:letter" },
 	{ rcvMoveAxesMachinePosition,		"move:axes^:machinePosition" },
+	{ rcvMoveAxesMax, 				"move:axes^:max" },
 	{ rcvMoveAxesUserPosition,			"move:axes^:userPosition" },
 	{ rcvMoveAxesVisible, 				"move:axes^:visible" },
 	{ rcvMoveAxesWorkplaceOffsets, 		"move:axes^:workplaceOffsets^" },
@@ -1135,7 +1137,7 @@ void HandleOutOfBufferResponse()
 		pollIntervalMultiplier += 0.1;
 		UpdatePollRate(screensaverActive);
 		oobCounter = 0;
-		MessageLog::AppendMessage("Info: slowing down poll rate");
+		MessageLog::AppendMessage(MessageLog::LogLevel::Normal, "Info: slowing down poll rate");
 	}
 	lastOutOfBufferResponse = now;
 	outOfBuffers = true;
@@ -1458,6 +1460,16 @@ static void ProcessReceivedValue(StringRef id, const char data[], const size_t i
 	case rcvMoveAxesLetter:
 		{
 			UI::SetAxisLetter(indices[0], data[0]);
+		}
+		break;
+
+	case rcvMoveAxesMax:
+		{
+			float val;
+			if (GetFloat(data, val))
+			{
+				UI::SetAxisMax(indices[0], val);
+			}
 		}
 		break;
 
@@ -2126,6 +2138,7 @@ static void ProcessReceivedValue(StringRef id, const char data[], const size_t i
 			switch (controlCommand)
 			{
 			case ControlCommand::eraseAndReset:
+				UI::ShowFirmwareUpdatePopup();
 				EraseAndReset();					// Does not return
 				break;
 			case ControlCommand::reset:
@@ -2246,7 +2259,7 @@ static void ParserErrorEncountered(int currentState, const char*, int errors)
 
 	if (errors > parserMinErrors)
 	{
-		MessageLog::AppendMessageF("Warning: received %d malformed responses.", errors);
+		MessageLog::AppendMessageF(MessageLog::LogLevel::Normal, "Warning: received %d malformed responses.", errors);
 	}
 	if (currentRespSeq == nullptr)
 	{
@@ -2357,6 +2370,8 @@ int main(void)
 
 	lastTouchTime = SystemTick::GetTickCount();
 
+	MessageLog::LogLevelSet(nvData.GetLogLevel());
+
 	firmwareFeatures = firmwareTypes[0].features;		// assume RepRapFirmware until we hear otherwise
 
 	// configure hardware for buzzer and backlight
@@ -2458,7 +2473,7 @@ int main(void)
 	dbg("basic init DONE\n");
 
 
-	MessageLog::AppendMessage("Info: successfully initialized.");
+	MessageLog::AppendMessage(MessageLog::LogLevel::Normal, "Info: successfully initialized.");
 
 	struct TouchEvent {
 		uint32_t x;

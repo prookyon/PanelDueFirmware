@@ -15,6 +15,7 @@
 #undef result
 #undef value
 #include "UI/ColourSchemes.hpp"
+#include "UI/MessageLog.hpp"
 #include "ObjectModel/PrinterStatus.hpp"
 #include "FlashData.hpp"
 #include "Configuration.hpp"
@@ -131,6 +132,7 @@ struct StringTable
 	CSTRING displayDimmingNames[(unsigned int)DisplayDimmerType::NumTypes];
 
 	CSTRING heaterCombineTypeNames[(unsigned int)HeaterCombineType::NumTypes];
+	CSTRING logLevelNames[(unsigned int)MessageLog::LogLevel::NumTypes];
 
 	CSTRING outOfRangeValueInt;
 	CSTRING outOfRangeValueFloat;
@@ -264,6 +266,12 @@ const StringTable LanguageTables[] =
 			"Heaters comb.",
 		},
 
+		// LogLevel names
+		{
+			"Normal",
+			"Verbose",
+		},
+
 		"value is out of range: %ld <= value <= %ld",
 		"value is out of range: %f <= value <= %f",
 		"text length is out of range: %ld <= length <= %ld",
@@ -392,6 +400,12 @@ const StringTable LanguageTables[] =
 		{
 			"Heat's nicht komb.",
 			"Heat's kombiniert"
+		},
+
+		// LogLevel names
+		{
+			"Normal",
+			"Verbose",
 		},
 
 		"value is out of range: %ld <= value <= %ld",
@@ -524,6 +538,12 @@ const StringTable LanguageTables[] =
 			"Heaters comb.",
 		},
 
+		// LogLevel names
+		{
+			"Normal",
+			"Verbose",
+		},
+
 		"value is out of range: %ld <= value <= %ld",
 		"value is out of range: %f <= value <= %f",
 		"text length is out of range: %ld <= length <= %ld",
@@ -652,6 +672,12 @@ const StringTable LanguageTables[] =
 		{
 			"Heat's not comb.",
 			"Heaters comb.",
+		},
+
+		// LogLevel names
+		{
+			"Normal",
+			"Verbose",
 		},
 
 		"value is out of range: %ld <= value <= %ld",
@@ -784,6 +810,12 @@ const StringTable LanguageTables[] =
 			"Heaters comb.",
 		},
 
+		// LogLevel names
+		{
+			"Normal",
+			"Verbose",
+		},
+
 		"value is out of range: %ld <= value <= %ld",
 		"value is out of range: %f <= value <= %f",
 		"text length is out of range: %ld <= length <= %ld",
@@ -914,10 +946,153 @@ const StringTable LanguageTables[] =
 			"Heaters comb.",
 		},
 
+		// LogLevel names
+		{
+			"Normal",
+			"Verbose",
+		},
+
 		"value is out of range: %ld <= value <= %ld",
 		"value is out of range: %f <= value <= %f",
 		"text length is out of range: %ld <= length <= %ld",
 	},
+
+
+	// dutch
+	{
+		// ISO-639.1 language code
+		"nl",
+
+		// Main page strings
+		"Controle",
+		"Print",
+		"Status",
+		"Console",
+		"Instellingen",
+		"Huidig" THIN_SPACE DEGREE_SYMBOL "C",
+		"Actief" THIN_SPACE DEGREE_SYMBOL "C",
+		"Stand-by" THIN_SPACE DEGREE_SYMBOL "C",
+		"Beweeg",
+		"Extrusie",
+		"Macro",
+		"STOP",
+
+		// Print page
+		"Extruder" THIN_SPACE "%",
+		"Snelheid  ",							// note space at end
+		"Ventilator  ",							// note space at end
+		"Benodigde tijd: ",
+		"sim'd ",							// note space at end
+		"Bestand  ",							// note space at end
+		"filament ",						// note space at end
+		"slicer ",							// note space at end
+		"N/A",
+		"Pause",
+		"Baby step",
+		"Hervatten",
+		"Annuleren",
+		"Print opnieuw",
+		"Simuleer opnieuw",
+		"Set",
+
+		// Setup page
+		"Volume ",							// note space at end
+		"Kalibreer scherm",
+		"Spiegel display",
+		"Omkeren display",
+		"Thema",
+		"Helderheid -",
+		"Helderheid +",
+		"Bewaar instellingen",
+		"Verwijder instellingen",
+		"Opslaan en herstart",
+		"Info time-out ",					// note space at end
+		"Screensaver ",						// note space at end
+		"Baby step ",						// note space at end
+		"Aanvoer snelheid ",					// note space at end
+
+		// Misc
+		"Bevestig fabrieksinstellingen",
+		"Bevestig verwijderen bestand",
+		"Weet je het zeker?",
+		"Aanraken punt",
+		"Beweeg printkop",
+		"Extrusie hoeveelheid (mm)",
+		"Snelheid (mm/s)",
+		"Extruderen",
+		"Intrekken",
+		"Baby stapjes",
+		"Actuele Z offset: ",
+		"Bericht",
+		"Berichten",
+		"Panel Due firmware versie ",	// note space at end
+		"Antwoord",
+		"No files found",
+
+		// File popup
+		"Bestanden op kaart ",				// note the space on the end
+		"Macros",
+		"Error ",						// note the space at the end
+		" toegang SD kaart",			// note the space at the start
+		"File: ",
+		"Grootte: ",
+		"Laaghoogte: ",
+		"Object hoogte: ",
+		"Benodigd filament: ",
+		"Sliced door: ",
+		"Date: ",
+		"Geschatte printtijd: ",
+		"Gesimuleerde printtijd: ",
+		"Simulatie",
+
+		// Printer status strings
+		{
+			"Verbinden",
+			"Inactief",
+			"Printen",
+			"Gestopt",
+			"Opstarten",
+			"Gepauzeerd",
+			"Bezig",
+			"Pauzeren",
+			"Hervatten",
+			"Firmware upload",
+			"Veranderen tool",
+			"Simuleren",
+			"Off",
+			"Cancelling",
+		},
+
+		// Theme names
+		{
+			"Licht thema",
+			"Donker thema 1",
+			"Donker thema 2"
+		},
+
+		// Display dimming types
+		{
+			"Nooit dimmen",
+			"Dim bij inactief",
+			"Altijd dimmen"
+		},
+
+		// Heater combine types
+		{
+			"Heat niet comb.",
+			"Heat comb.",
+		},
+
+		// LogLevel names
+		{
+			"Normal",
+			"Verbose",
+		},
+
+		"value is out of range: %ld <= value <= %ld",
+		"value is out of range: %f <= value <= %f",
+		"text length is out of range: %ld <= length <= %ld",
+ 	},
 
 	// Polish
 	{
@@ -1042,6 +1217,12 @@ const StringTable LanguageTables[] =
 		{
 			"Głowica prosta",
 			"Głowica inna",
+		},
+
+		// LogLevel names
+		{
+			"Normal",
+			"Verbose",
 		},
 
 		"value is out of range: %ld <= value <= %ld",
@@ -1175,6 +1356,12 @@ const StringTable LanguageTables[] =
 			"Heaters comb.",
 		},
 
+		// LogLevel names
+		{
+			"Normal",
+			"Verbose",
+		},
+
 		"value is out of range: %ld <= value <= %ld",
 		"value is out of range: %f <= value <= %f",
 		"text length is out of range: %ld <= length <= %ld",
@@ -1301,6 +1488,12 @@ const StringTable LanguageTables[] =
 		{
 			"Нагреватели не комб.",
 			"Нагреватели комб.",
+		},
+
+		// LogLevel names
+		{
+			"Normal",
+			"Verbose",
 		},
 
 		"value is out of range: %ld <= value <= %ld",
@@ -1432,6 +1625,12 @@ const StringTable LanguageTables[] =
 		{
 			"Heat's not comb.",
 			"Heaters comb.",
+		},
+
+		// LogLevel names
+		{
+			"Normal",
+			"Verbose",
 		},
 
 		"value is out of range: %ld <= value <= %ld",
